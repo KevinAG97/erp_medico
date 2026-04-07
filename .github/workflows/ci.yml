@@ -1,0 +1,46 @@
+name: CI - ERP Médico
+
+# QUANDO rodar: a cada push ou pull request na branch main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build e Testes
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # TASK 1 — Baixa o código do repositório para a máquina virtual
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # TASK 2 — Configura o Python na máquina virtual
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      # TASK 3 — Instala as dependências do projeto
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      # TASK 4 — Verifica qualidade e estilo do código (flake8)
+      - name: Lint - verificar qualidade do código (flake8)
+        run: flake8 . --max-line-length=120 --exclude=venv,migrations
+
+      # TASK 5 — Verifica se há migrações pendentes não commitadas
+      - name: Verificar migrações pendentes
+        env:
+          SECRET_KEY: ci-secret-key-apenas-para-testes
+        run: python manage.py migrate --check
+
+      # TASK 6 — Executa os testes unitários e de integração
+      - name: Executar testes
+        env:
+          SECRET_KEY: ci-secret-key-apenas-para-testes
+        run: python manage.py test --verbosity=2
