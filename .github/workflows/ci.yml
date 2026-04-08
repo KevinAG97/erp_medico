@@ -33,11 +33,11 @@ jobs:
       - name: Lint - verificar qualidade do código (flake8)
         run: flake8 . --max-line-length=120 --exclude=venv,migrations
 
-      # TASK 5 — Verifica se há migrações pendentes não commitadas
+      # TASK 5 — Verifica se há mudanças nos models sem migration criada
       - name: Verificar migrações pendentes
         env:
           SECRET_KEY: ci-secret-key-apenas-para-testes
-        run: python manage.py migrate --check
+        run: python manage.py makemigrations --check --dry-run
 
       # TASK 6 — Executa os testes unitários e de integração
       - name: Executar testes
