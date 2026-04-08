@@ -2,9 +2,6 @@ from rest_framework import serializers
 from .models import Paciente
 
 
-
-
-
 class PacienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paciente
@@ -15,4 +12,4 @@ class PacienteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('O CPF deve conter apenas números.')
         if len(value) != 11:
             raise serializers.ValidationError('O CPF deve conter exatamente 11 dígitos.')
-        
+        return value
